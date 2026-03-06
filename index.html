@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>シークレットラッキーブロック</title>
+    <style>
+        body { 
+            text-align: center; 
+            background: radial-gradient(circle, #1a1a2e, #000000); 
+            color: white; 
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            text-shadow: 0 0 15px #ff00ff;
+            margin: 10px 0;
+            letter-spacing: 2px;
+        }
+
+        #display-area { 
+            width: 90%;
+            height: 50vh; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+        }
+
+        img { 
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            cursor: pointer;
+            transition: transform 0.1s ease-out;
+            filter: drop-shadow(0 0 10px rgba(255,255,255,0.3));
+        }
+
+        img:active { transform: scale(0.85); }
+
+        .result-name { 
+            font-size: 1.5rem;
+            font-weight: bold; 
+            margin-top: 20px;
+            height: 40px;
+            color: #00d4ff;
+            text-shadow: 0 0 5px #000;
+        }
+
+        .hint { color: #aaa; font-size: 0.8rem; margin-bottom: 20px; }
+        
+        .rolling {
+            animation: shake 0.1s infinite;
+        }
+        @keyframes shake {
+            0% { transform: translate(0,0) rotate(0); }
+            50% { transform: translate(2px, 2px) rotate(2deg); }
+            100% { transform: translate(-2px, -2px) rotate(-2deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>SECRET LUCKY BLOCK</h1>
+    <p class="hint">ブロックをタップ！</p>
+    
+    <div id="display-area">
+        <img id="gacha-img" src="gacha.png" alt="Lucky Block" onclick="startGacha()">
+    </div>
+    
+    <div id="result-text" class="result-name">READY...</div>
+
+<script>
+    const gachaImg = document.getElementById('gacha-img');
+    const resultText = document.getElementById('result-text');
+    let isRolling = false;
+
+    // 名前をすべて指定のものに変更
+    const items = [
+        { name: "ペガサス", img: "pegasus.png", weight: 0.01 },
+        { name: "シークレットコンビナーション", img: "combined.png", weight: 0.5 },
+        { name: "スパゲッティトワレッティ", img: "toilet.png", weight: 1.0 },
+        { name: "ホットスポット", img: "house.png", weight: 3.0 },
+        { name: "エゾクセコラ", img: "skeleton.png", weight: 19.0 },
+        { name: "ドラゴンフルティーニ", img: "dragon.png", weight: 75.0 },
+        { name: "ドラゴンフルティーニ", img: "dragon.png", weight: 1.49 }
+    ];
+
+    const allImages = ["pegasus.png", "combined.png", "toilet.png", "house.png", "skeleton.png", "dragon.png"];
+
+    function startGacha() {
+        if (isRolling) return;
+        isRolling = true;
+        
+        resultText.innerText = "OPENING...";
+        resultText.style.color = "#fff";
+        gachaImg.classList.add('rolling');
+
+        let count = 0;
+        const interval = setInterval(() => {
+            const randomImg = allImages[Math.floor(Math.random() * allImages.length)];
+            gachaImg.src = randomImg;
+            count++;
+            
+            if (count >= 4) {
+                clearInterval(interval);
+                gachaImg.classList.remove('rolling');
+                showResult();
+            }
+        }, 500);
+    }
+
+    function showResult() {
+        const rand = Math.random() * 100;
+        let currentWeight = 0;
+        let selectedItem = items[items.length - 1];
+
+        for (const item of items) {
+            currentWeight += item.weight;
+            if (rand < currentWeight) {
+                selectedItem = item;
+                break;
+            }
+        }
+
+        gachaImg.src = selectedItem.img;
+        resultText.innerText = selectedItem.name;
+        
+        if(selectedItem.weight <= 0.5) resultText.style.color = "#ff00ff";
+        else if(selectedItem.weight <= 3.0) resultText.style.color = "#ffff00";
+        else resultText.style.color = "#00d4ff";
+
+        setTimeout(() => {
+            gachaImg.src = "gacha.png";
+            resultText.innerText = "READY...";
+            resultText.style.color = "#00d4ff";
+            isRolling = false;
+        }, 3000);
+    }
+</script>
+</body>
+</html>
